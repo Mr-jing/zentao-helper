@@ -23,6 +23,8 @@ $app->withFacades();
 
 $app->withEloquent();
 
+\Illuminate\Support\Facades\DB::connection()->enableQueryLog();
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
