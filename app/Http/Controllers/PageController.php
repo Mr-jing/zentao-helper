@@ -15,14 +15,16 @@ class PageController extends Controller
         $this->tasks = $tasks;
     }
 
-    public function getIndex()
+    public function getIndex($id)
     {
-        $total = array_extract_key($this->bugs->total(2)->toArray(), 'resolvedBy');
-        $severeTotal = array_extract_key($this->bugs->severeTotal(2)->toArray(), 'resolvedBy');
-        $reactivatedTotal = array_extract_key($this->bugs->reactivatedTotal(2)->toArray(), 'resolvedBy');
-        $runningHours = array_extract_key($this->tasks->runningHours(1)->toArray(), 'finishedBy');
+        $projectId = $id;
 
-        var_dump($total, $severeTotal, $reactivatedTotal, $runningHours);
+        $total = array_extract_key($this->bugs->total($projectId)->toArray(), 'resolvedBy');
+        $severeTotal = array_extract_key($this->bugs->severeTotal($projectId)->toArray(), 'resolvedBy');
+        $reactivatedTotal = array_extract_key($this->bugs->reactivatedTotal($projectId)->toArray(), 'resolvedBy');
+        $runningHours = array_extract_key($this->tasks->runningHours($projectId)->toArray(), 'finishedBy');
+
+//        var_dump($total, $severeTotal, $reactivatedTotal, $runningHours);
 
         $users = array_unique(array_merge(
             array_keys($total),
@@ -30,7 +32,7 @@ class PageController extends Controller
             array_keys($reactivatedTotal),
             array_keys($runningHours)
         ));
-        var_dump($users);
+//        var_dump($users);
 
         $result = array();
         foreach ($users as $user) {
@@ -41,10 +43,11 @@ class PageController extends Controller
                 'severe_bug_total' => isset($severeTotal[$user]['total']) ? $severeTotal[$user]['total'] : 0,
                 'reactivated_bug_total' => isset($reactivatedTotal[$user]['total']) ? $reactivatedTotal[$user]['total'] : 0,
             );
+            $result[$user] = array_merge($result[$user], $this->tasks->deviation($user, $projectId));
         }
-        var_dump($result);
+//        var_dump($result);
 
-        var_dump(DB::getQueryLog());
-        return 'hi';
+//        var_dump(DB::getQueryLog());
+        return view('index', array('records' => $result));
     }
 }
