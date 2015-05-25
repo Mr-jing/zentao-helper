@@ -2,7 +2,7 @@
 <html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <title>统计结果</title>
+    <title><?= $project->name; ?> - 统计结果</title>
     <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -14,6 +14,7 @@
 <body>
 
 <div>
+    <h1 class="text-center"><?= $project->name; ?></h1>
     <table class="table table-striped">
         <thead>
         <tr>
@@ -32,7 +33,7 @@
         <tbody>
         <?php foreach ($records as $user => $record): ?>
             <tr>
-                <th><?= $user; ?></th>
+                <th><?= $record['user']; ?></th>
                 <td><?= $record['estimate_sum']; ?></td>
                 <td><?= $record['consumed_sum']; ?></td>
                 <td><?= abs($record['hour_plus_deviation']); ?></td>

@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Bug;
+use App\Project;
 use App\Task;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,7 @@ class PageController extends Controller
     public function getIndex($id)
     {
         $projectId = $id;
+        $project = Project::findOrFail($projectId);
 
         $total = array_extract_key($this->bugs->total($projectId)->toArray(), 'resolvedBy');
         $severeTotal = array_extract_key($this->bugs->severeTotal($projectId)->toArray(), 'resolvedBy');
@@ -37,6 +39,7 @@ class PageController extends Controller
         $result = array();
         foreach ($users as $user) {
             $result[$user] = array(
+                'user' => strtolower($user),
                 'estimate_sum' => isset($runningHours[$user]['estimate_sum']) ? $runningHours[$user]['estimate_sum'] : 0,
                 'consumed_sum' => isset($runningHours[$user]['consumed_sum']) ? $runningHours[$user]['consumed_sum'] : 0,
                 'all_bug_total' => isset($total[$user]['total']) ? $total[$user]['total'] : 0,
@@ -47,7 +50,19 @@ class PageController extends Controller
         }
 //        var_dump($result);
 
+        $records = collect($result)->sortBy('user', SORT_REGULAR, false)->toArray();
+
 //        var_dump(DB::getQueryLog());
-        return view('index', array('records' => $result));
+        return view('index', array(
+            'project' => $project,
+            'records' => $records,
+        ));
+    }
+
+
+    public function getShow($id, $name)
+    {
+        var_dump($id, $name);
+        return '';
     }
 }
