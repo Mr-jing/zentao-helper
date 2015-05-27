@@ -55,6 +55,14 @@ class Bug extends Model
             ->get();
     }
 
+    public function activatedTotal($projectId)
+    {
+        return $this->select(DB::raw('count(*) as total, assignedTo'))
+            ->where('project', $projectId)
+            ->where('status', 'active')
+            ->groupBy('assignedTo')
+            ->get();
+    }
 
     public function scopeProject($query, $projectId)
     {

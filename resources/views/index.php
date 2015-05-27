@@ -18,16 +18,17 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>姓名</th>
-            <th>预计总工时（小时）</th>
-            <th>实际总工时（小时）</th>
-            <th>工时正偏差（小时）</th>
-            <th>工时负偏差（小时）</th>
-            <th>工期正偏差（天）</th>
-            <th>工期负偏差（天）</th>
-            <th>个人 Bug 总数</th>
-            <th>一二级 Bug 数</th>
-            <th>反复激活 Bug 数</th>
+            <th>成员名称<br/>（字母顺序）</th>
+            <th>预计总工时<br/>（小时）</th>
+            <th>实际总工时<br/>（小时）</th>
+            <th>工时正偏差<br/>（小时）</th>
+            <th>工时负偏差<br/>（小时）</th>
+            <th>工期正偏差<br/>（天）</th>
+            <th>工期负偏差<br/>（天）</th>
+            <th>未解决<br/> Bug 总数</th>
+            <th>已解决个人<br/> Bug 总数</th>
+            <th>已解决一二级<br/> Bug 数</th>
+            <th>已解决反复激活<br/> Bug 数</th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@
                 <td><?= abs($record['hour_minus_deviation']); ?></td>
                 <td><?= abs($record['day_plus_deviation']); ?></td>
                 <td><?= abs($record['day_minus_deviation']); ?></td>
+                <td><?= $record['activated_bug_total']; ?></td>
                 <td><?= $record['all_bug_total']; ?></td>
                 <td><?= $record['severe_bug_total']; ?></td>
                 <td>
