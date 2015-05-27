@@ -39,7 +39,8 @@ class Task extends Model
     {
         return $this->select(DB::raw('SUM(consumed) as consumed_sum, SUM(estimate) as estimate_sum, finishedBy'))
             ->where('project', $projectId)
-            ->where('finishedBy', '!=', '')
+//            ->where('finishedBy', '!=', '')
+            ->where('status', 'done')
             ->groupBy('finishedBy')
             ->get();
     }
@@ -54,11 +55,19 @@ class Task extends Model
      */
     public function getUserTasksByProjectId($account, $projectId)
     {
-//        return $this->select('finishedBy', 'estimate', 'consumed', 'deadline', 'finishedDate')
-        return $this
+        return $this->select('finishedBy', 'estimate', 'consumed', 'deadline', 'finishedDate')
+//        return $this
+            ->where('status', 'done')
             ->where('finishedBy', $account)
             ->where('project', $projectId)
             ->get();
+    }
+
+
+    public function scopeUserDone($query, $account)
+    {
+        return $query->where('status', 'done')
+            ->where('finishedBy', $account);
     }
 
     /**
@@ -94,6 +103,51 @@ class Task extends Model
             }
         }
         return $result;
+    }
+
+
+    public function getHourPlusDeviation()
+    {
+        $hourDiff = $this->estimate - $this->consumed;
+        if ($hourDiff > 0) {
+            return $hourDiff;
+        } else {
+            return 0;
+        }
+
+    }
+
+    public function getHourMinusDeviation()
+    {
+        $hourDiff = $this->estimate - $this->consumed;
+        if ($hourDiff < 0) {
+            return $hourDiff;
+        } else {
+            return 0;
+        }
+
+    }
+
+    public function getDayPlusDeviation()
+    {
+        $dayDiff = $this->deadline->diffInDays($this->finishedDate, false);
+
+        if ($dayDiff < 0) {
+            return $dayDiff;
+        } else {
+            return 0;
+        }
+    }
+
+    public function getDayMinusDeviation()
+    {
+        $dayDiff = $this->deadline->diffInDays($this->finishedDate, false);
+
+        if ($dayDiff > 0) {
+            return $dayDiff;
+        } else {
+            return 0;
+        }
     }
 
 }

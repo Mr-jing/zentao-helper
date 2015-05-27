@@ -52,7 +52,6 @@ class PageController extends Controller
 
         $records = collect($result)->sortBy('user', SORT_REGULAR, false)->toArray();
 
-//        var_dump(DB::getQueryLog());
         return view('index', array(
             'project' => $project,
             'records' => $records,
@@ -64,5 +63,33 @@ class PageController extends Controller
     {
         var_dump($id, $name);
         return '';
+    }
+
+
+    public function getDeviations($id, $name)
+    {
+        $project = Project::findOrFail($id);
+        $tasks = $project->userDoneTasks($name);
+
+//        var_dump(DB::getQueryLog());
+
+        return view('deviations', array(
+            'project' => $project,
+            'tasks' => $tasks,
+        ));
+    }
+
+    public function getReactivated($id, $name)
+    {
+        $project = Project::findOrFail($id);
+        $reactivatedBugs = $project->userReactivatedBugs($name);
+
+//        var_dump(DB::getQueryLog());
+
+        return view('reactivated', array(
+            'project' => $project,
+            'bugs' => $reactivatedBugs,
+        ));
+
     }
 }

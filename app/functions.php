@@ -15,3 +15,13 @@ if (!function_exists('array_extract_key')) {
         return $result;
     }
 }
+
+function zentao_bug_url($bugId)
+{
+    return getenv('ZENTAO_BUG_URL') . strval($bugId);
+}
+
+function zentao_task_url($taskId)
+{
+    return getenv('ZENTAO_TASK_URL') . strval($taskId);
+}

@@ -10,4 +10,19 @@ class Project extends Model
 
     public $timestamps = false;
 
+
+    public function userDoneTasks($user)
+    {
+        return $this->hasMany('App\Task', 'project')
+            ->UserDone($user)
+            ->get();
+    }
+
+    public function userReactivatedBugs($user)
+    {
+        return $this->hasMany('App\Bug', 'project')
+            ->userReactivated($user)
+            ->get();
+    }
+
 }

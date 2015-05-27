@@ -10,43 +10,50 @@
     <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <style>
+        .task_name {
+            display: inline-block;
+            width: 200px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
 <div>
     <h1 class="text-center"><?= $project->name; ?></h1>
-    <table class="table table-hover">
+    <table class="table table-striped">
         <thead>
         <tr>
-            <th>姓名</th>
-            <th>预计总工时（小时）</th>
-            <th>实际总工时（小时）</th>
+            <th>任务</th>
+            <th>预计工时（小时）</th>
+            <th>实际工时（小时）</th>
             <th>工时正偏差（小时）</th>
             <th>工时负偏差（小时）</th>
+            <th>预计截至日期</th>
+            <th>实际截至日期</th>
             <th>工期正偏差（天）</th>
             <th>工期负偏差（天）</th>
-            <th>个人 Bug 总数</th>
-            <th>一二级 Bug 数</th>
-            <th>反复激活 Bug 数</th>
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($records as $user => $record): ?>
+        <?php foreach ($tasks as $task): ?>
             <tr>
                 <td>
-                    <a href="<?= url('/deviations/' . $project->id . '/' . $record['user']); ?>"><strong><?= $record['user']; ?></strong></a>
+                    <a class="task_name" target="_blank" title="<?= $task->name; ?>"
+                       href="<?= zentao_task_url($task->id); ?>"><?= $task->name; ?></a>
                 </td>
-                <td><?= $record['estimate_sum']; ?></td>
-                <td><?= $record['consumed_sum']; ?></td>
-                <td><?= abs($record['hour_plus_deviation']); ?></td>
-                <td><?= abs($record['hour_minus_deviation']); ?></td>
-                <td><?= abs($record['day_plus_deviation']); ?></td>
-                <td><?= abs($record['day_minus_deviation']); ?></td>
-                <td><?= $record['all_bug_total']; ?></td>
-                <td><?= $record['severe_bug_total']; ?></td>
-                <td>
-                    <a href="<?= url('/reactivated/' . $project->id . '/' . $record['user']); ?>"><strong><?= $record['reactivated_bug_total']; ?></strong></a>
-                </td>
+                <td><?= $task->estimate; ?></td>
+                <td><?= $task->consumed; ?></td>
+                <td><?= abs($task->getHourPlusDeviation()); ?></td>
+                <td><?= abs($task->getHourMinusDeviation()); ?></td>
+                <td><?= $task->deadline->toDateString(); ?></td>
+                <td><?= $task->finishedDate->toDateString(); ?></td>
+                <td><?= abs($task->getDayPlusDeviation()); ?></td>
+                <td><?= abs($task->getDayMinusDeviation()); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
