@@ -21,11 +21,13 @@ class PageController extends Controller
         $projectId = $id;
         $project = Project::findOrFail($projectId);
 
-        $total = array_extract_key($this->bugs->total($projectId)->toArray(), 'resolvedBy');
-        $severeTotal = array_extract_key($this->bugs->severeTotal($projectId)->toArray(), 'resolvedBy');
-        $reactivatedTotal = array_extract_key($this->bugs->reactivatedTotal($projectId)->toArray(), 'resolvedBy');
-        $activatedTotal = array_extract_key($this->bugs->activatedTotal($projectId)->toArray(), 'assignedTo');
-        $runningHours = array_extract_key($this->tasks->runningHours($projectId)->toArray(), 'finishedBy');
+        $date = \Request::input('date', null);
+
+        $total = array_extract_key($this->bugs->total($projectId, $date)->toArray(), 'resolvedBy');
+        $severeTotal = array_extract_key($this->bugs->severeTotal($projectId, $date)->toArray(), 'resolvedBy');
+        $reactivatedTotal = array_extract_key($this->bugs->reactivatedTotal($projectId, $date)->toArray(), 'resolvedBy');
+        $activatedTotal = array_extract_key($this->bugs->activatedTotal($projectId, $date)->toArray(), 'assignedTo');
+        $runningHours = array_extract_key($this->tasks->runningHours($projectId, $date)->toArray(), 'finishedBy');
 
 //        var_dump($activatedTotal, $total, $severeTotal, $reactivatedTotal, $runningHours);
 

@@ -31,37 +31,70 @@ class Bug extends Model
         'tostory' => '转为需求',
     );
 
-    public function total($projectId)
+    public function total($projectId, $date = null)
     {
-        return $this->project($projectId)
-            ->groupBy('resolvedBy')
-            ->get();
+        if (is_null($date)) {
+            return $this->project($projectId)
+                ->groupBy('resolvedBy')
+                ->get();
+        } else {
+            return $this->project($projectId)
+                ->where('openedDate', '>', $date)
+                ->groupBy('resolvedBy')
+                ->get();
+        }
     }
 
 
-    public function severeTotal($projectId)
+    public function severeTotal($projectId, $date = null)
     {
-        return $this->project($projectId)
-            ->severity()
-            ->groupBy('resolvedBy')
-            ->get();
+        if (is_null($date)) {
+            return $this->project($projectId)
+                ->severity()
+                ->groupBy('resolvedBy')
+                ->get();
+        } else {
+            return $this->project($projectId)
+                ->severity()
+                ->where('openedDate', '>', $date)
+                ->groupBy('resolvedBy')
+                ->get();
+        }
     }
 
-    public function reactivatedTotal($projectId)
+    public function reactivatedTotal($projectId, $date = null)
     {
-        return $this->project($projectId)
-            ->reactivated()
-            ->groupBy('resolvedBy')
-            ->get();
+        if (is_null($date)) {
+            return $this->project($projectId)
+                ->reactivated()
+                ->groupBy('resolvedBy')
+                ->get();
+        } else {
+            return $this->project($projectId)
+                ->reactivated()
+                ->where('openedDate', '>', $date)
+                ->groupBy('resolvedBy')
+                ->get();
+
+        }
     }
 
-    public function activatedTotal($projectId)
+    public function activatedTotal($projectId, $date = null)
     {
-        return $this->select(DB::raw('count(*) as total, assignedTo'))
-            ->where('project', $projectId)
-            ->where('status', 'active')
-            ->groupBy('assignedTo')
-            ->get();
+        if (is_null($date)) {
+            return $this->select(DB::raw('count(*) as total, assignedTo'))
+                ->where('project', $projectId)
+                ->where('status', 'active')
+                ->groupBy('assignedTo')
+                ->get();
+        } else {
+            return $this->select(DB::raw('count(*) as total, assignedTo'))
+                ->where('project', $projectId)
+                ->where('status', 'active')
+                ->where('openedDate', '>', $date)
+                ->groupBy('assignedTo')
+                ->get();
+        }
     }
 
     public function scopeProject($query, $projectId)

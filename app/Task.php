@@ -35,14 +35,25 @@ class Task extends Model
      * @param $projectId
      * @return mixed
      */
-    public function runningHours($projectId)
+    public function runningHours($projectId, $date = null)
     {
-        return $this->select(DB::raw('SUM(consumed) as consumed_sum, SUM(estimate) as estimate_sum, finishedBy'))
-            ->where('project', $projectId)
+        if (is_null($date)) {
+            return $this->select(DB::raw('SUM(consumed) as consumed_sum, SUM(estimate) as estimate_sum, finishedBy'))
+                ->where('project', $projectId)
 //            ->where('finishedBy', '!=', '')
-            ->where('status', 'done')
-            ->groupBy('finishedBy')
-            ->get();
+                ->where('status', 'done')
+                ->groupBy('finishedBy')
+                ->get();
+
+        } else {
+            return $this->select(DB::raw('SUM(consumed) as consumed_sum, SUM(estimate) as estimate_sum, finishedBy'))
+                ->where('project', $projectId)
+//            ->where('finishedBy', '!=', '')
+                ->where('openedDate', '>', $date)
+                ->where('status', 'done')
+                ->groupBy('finishedBy')
+                ->get();
+        }
     }
 
 
