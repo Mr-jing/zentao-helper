@@ -12,6 +12,11 @@ $app->get(ROUTE_BASE . '/project/{id:\d+}/u/{name:\w+}', array(
     'uses' => 'App\Http\Controllers\PageController@getShow',
 ));
 
+// 报表页面
+$app->get(ROUTE_BASE . '/statement', array(
+    'as' => 'statement',
+    'uses' => 'App\Http\Controllers\PageController@getStatement',
+));
 
 $app->get(ROUTE_BASE . '/deviations/{id:\d+}/{name:\w+}', array(
     'as' => 'deviations',

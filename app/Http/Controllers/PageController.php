@@ -66,10 +66,36 @@ class PageController extends Controller
     }
 
 
-    public function getShow($id, $name)
+    public function getStatement()
     {
-        var_dump($id, $name);
-        return '';
+        // 获取参数
+        $users = \Request::input('users', null);
+        $start = \Request::input('start', null);
+        $end = \Request::input('end', date('Y-m-d'));
+
+        // 验证参数
+        $validator = \Validator::make(
+            array(
+                'users' => $users,
+                'start' => $start,
+                'end' => $end,
+            ),
+            array(
+                'users' => 'required',
+                'start' => 'required|date_format:Y-m-d',
+                'end' => 'required|date_format:Y-m-d',
+            )
+        );
+        if ($validator->fails()) {
+            return current($validator->messages()->all());
+        }
+        if (strtotime($start) > strtotime($end)) {
+            return '起始时间必须小于截至时间';
+        }
+//        $bugs = $this->bugs->assignedTo(array('king'))->start($start)->end($end)->get();
+
+        // bug 按照创建时间
+        // task 按照预计开始时间、实际开始时间中小的那个
     }
 
 
@@ -78,25 +104,21 @@ class PageController extends Controller
         $project = Project::findOrFail($id);
         $tasks = $project->userDoneTasks($name);
 
-//        var_dump(DB::getQueryLog());
-
         return view('deviations', array(
             'project' => $project,
             'tasks' => $tasks,
         ));
     }
 
+
     public function getReactivated($id, $name)
     {
         $project = Project::findOrFail($id);
         $reactivatedBugs = $project->userReactivatedBugs($name);
 
-//        var_dump(DB::getQueryLog());
-
         return view('reactivated', array(
             'project' => $project,
             'bugs' => $reactivatedBugs,
         ));
-
     }
 }
