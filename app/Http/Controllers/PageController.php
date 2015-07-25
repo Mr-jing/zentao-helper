@@ -71,7 +71,7 @@ class PageController extends Controller
         // 获取参数
         $users = \Request::input('users', null);
         $start = \Request::input('start', null);
-        $end = \Request::input('end', date('Y-m-d'));
+        $end = \Request::input('end', null);
 
         // 验证参数
         $validator = \Validator::make(
@@ -92,7 +92,42 @@ class PageController extends Controller
         if (strtotime($start) > strtotime($end)) {
             return '起始时间必须小于截至时间';
         }
-//        $bugs = $this->bugs->assignedTo(array('king'))->start($start)->end($end)->get();
+
+
+        $bugs = $this->bugs->where('openedDate', '>=', $start)
+            ->where('openedDate', '<=', $end)
+            ->where(function ($query) {
+                $query->where('assignedTo', 'dev1')
+                    ->orWhere('resolvedBy', 'dev1');
+            })->groupBy('id')
+            ->get();
+
+        $tasks = $this->tasks->where('assignedTo', 'dev1')
+            ->where(function ($query) use ($start, $end) {
+                $query->where(function ($q1) use ($start, $end) {
+                    $q1->where('estStarted', '>=', $start)->where('estStarted', '<=', $end);
+                })->orWhere(function ($q2) use ($start, $end) {
+                    $q2->where('realStarted', '>=', $start)->where('realStarted', '<=', $end);
+                });
+            })->get();
+
+        echo '<br />指派给我：<br />';
+        var_dump($bugs->where('assignedTo', 'dev1')->count());
+
+        echo '<br />由我解决：<br />';
+        var_dump($bugs->where('resolvedBy', 'dev1')->count());
+
+        echo '<br />由我解决的 1级和 2级：<br />';
+        var_dump($bugs->where('resolvedBy', 'dev1')->filter(function ($item) {
+            return in_array(data_get($item, 'severity'), array(1, 2));
+        })->count());
+
+        echo '<br />重复激活并且解决的 bug 数：<br />';
+        var_dump($bugs->where('resolvedBy', 'dev1')->filter(function ($item) {
+            return data_get($item, 'activatedCount') > 0;
+        })->count());
+
+        dd(\DB::getQueryLog());
 
         // bug 按照创建时间
         // task 按照预计开始时间、实际开始时间中小的那个
