@@ -27,3 +27,9 @@ $app->get(ROUTE_BASE . '/reactivated/{id:\d+}/{name:\w+}', array(
     'as' => 'reactivated',
     'uses' => 'App\Http\Controllers\PageController@getReactivated',
 ));
+
+// bug 搜索页
+$app->get(ROUTE_BASE . '/bug/search', array(
+    'as' => 'bug_search',
+    'uses' => 'App\Http\Controllers\BugController@search',
+));

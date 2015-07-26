@@ -14,7 +14,7 @@
 <body>
 
 <div>
-    <h1 class="text-center"> <?=$start;?> 至 <?=$end;?> 统计结果</h1>
+    <h1 class="text-center"> <?= $start; ?> 至 <?= $end; ?> 统计结果</h1>
     <table class="table table-hover">
         <thead>
         <tr>
