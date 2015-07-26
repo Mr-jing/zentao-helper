@@ -111,7 +111,44 @@ class PageController extends Controller
                 });
             })->get();
 
-        echo '<br />指派给我：<br />';
+        echo '<pre>';
+        var_dump(count($tasks));
+
+        $estimateHours = $tasks->sum('estimate');
+        $consumedHours = $tasks->sum('consumed');
+
+        $hourPlusDeviation = $tasks->sum(function ($task) {
+            return $task->getHourPlusDeviation();
+        });
+        $hourMinusDeviation = $tasks->sum(function ($task) {
+            return $task->getHourMinusDeviation();
+        });
+        $dayPlusDeviation = $tasks->sum(function ($task) {
+            return $task->getDayPlusDeviation();
+        });
+        $dayMinusDeviation = $tasks->sum(function ($task) {
+            return $task->getDayMinusDeviation();
+        });
+
+        echo '<br />预计总工时<br />';
+        var_dump($estimateHours);
+
+        echo '<br />实际总工时<br />';
+        var_dump($consumedHours);
+
+        echo '<br />总工时正偏差<br />';
+        var_dump($hourPlusDeviation);
+
+        echo '<br />总工时负偏差<br />';
+        var_dump($hourMinusDeviation);
+
+        echo '<br />总工期正偏差<br />';
+        var_dump($dayPlusDeviation);
+
+        echo '<br />总工期负偏差<br />';
+        var_dump($dayMinusDeviation);
+
+        echo '<br />指派给我：<br>';
         var_dump($bugs->where('assignedTo', 'dev1')->count());
 
         echo '<br />由我解决：<br />';

@@ -11,6 +11,7 @@ class Task extends Model
 
     public $timestamps = false;
 
+
     public function user()
     {
         return $this->belongsTo('App\User', 'finishedBy', 'account');
@@ -117,28 +118,44 @@ class Task extends Model
     }
 
 
+    /**
+     * 工时正偏差（提前多少小时完工）
+     *
+     * @return float
+     */
     public function getHourPlusDeviation()
     {
         $hourDiff = $this->estimate - $this->consumed;
         if ($hourDiff > 0) {
             return $hourDiff;
         } else {
-            return 0;
+            return 0.0;
         }
-
     }
 
+
+    /**
+     * 工时负偏差（延后多少小时完工）
+     *
+     * @return float
+     */
     public function getHourMinusDeviation()
     {
         $hourDiff = $this->estimate - $this->consumed;
         if ($hourDiff < 0) {
             return $hourDiff;
         } else {
-            return 0;
+            return 0.0;
         }
 
     }
 
+
+    /**
+     * 工期正偏差（提前多少天完工）
+     *
+     * @return float
+     */
     public function getDayPlusDeviation()
     {
         $dayDiff = $this->deadline->diffInDays($this->finishedDate, false);
@@ -146,10 +163,16 @@ class Task extends Model
         if ($dayDiff < 0) {
             return $dayDiff;
         } else {
-            return 0;
+            return 0.0;
         }
     }
 
+
+    /**
+     * 工期负偏差（延后多少天完工）
+     *
+     * @return float
+     */
     public function getDayMinusDeviation()
     {
         $dayDiff = $this->deadline->diffInDays($this->finishedDate, false);
@@ -157,7 +180,7 @@ class Task extends Model
         if ($dayDiff > 0) {
             return $dayDiff;
         } else {
-            return 0;
+            return 0.0;
         }
     }
 
