@@ -3,7 +3,6 @@
 use App\Bug;
 use App\Project;
 use App\Task;
-use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {
@@ -53,11 +52,8 @@ class PageController extends Controller
             );
             $result[$user] = array_merge($result[$user], $this->tasks->deviation($user, $projectId));
         }
-//        var_dump($result);
 
         $records = collect($result)->sortBy('user', SORT_REGULAR, false)->toArray();
-
-//        var_dump(DB::getQueryLog());
 
         return view('index', array(
             'project' => $project,
@@ -93,81 +89,83 @@ class PageController extends Controller
             return '起始时间必须小于截至时间';
         }
 
+        $users = $this->getUsers($users);
 
-        $bugs = $this->bugs->where('openedDate', '>=', $start)
-            ->where('openedDate', '<=', $end)
-            ->where(function ($query) {
-                $query->where('assignedTo', 'dev1')
-                    ->orWhere('resolvedBy', 'dev1');
-            })->groupBy('id')
-            ->get();
+        return view('statement', array(
+            'start' => $start,
+            'end' => $end,
+            'rows' => $this->getRows($users, $start, $end),
+        ));
+    }
 
-        $tasks = $this->tasks->where('assignedTo', 'dev1')
-            ->where(function ($query) use ($start, $end) {
-                $query->where(function ($q1) use ($start, $end) {
-                    $q1->where('estStarted', '>=', $start)->where('estStarted', '<=', $end);
-                })->orWhere(function ($q2) use ($start, $end) {
-                    $q2->where('realStarted', '>=', $start)->where('realStarted', '<=', $end);
-                });
-            })->get();
 
-        echo '<pre>';
-        var_dump(count($tasks));
+    protected function getUsers($users)
+    {
+        // 初步处理 users
+        $users = array_map(function ($user) {
+            return trim($user);
+        }, explode('|', $users));
 
-        $estimateHours = $tasks->sum('estimate');
-        $consumedHours = $tasks->sum('consumed');
+        // 所有合法账号
+        $accounts = \DB::table('zt_user')->lists('account');
 
-        $hourPlusDeviation = $tasks->sum(function ($task) {
-            return $task->getHourPlusDeviation();
-        });
-        $hourMinusDeviation = $tasks->sum(function ($task) {
-            return $task->getHourMinusDeviation();
-        });
-        $dayPlusDeviation = $tasks->sum(function ($task) {
-            return $task->getDayPlusDeviation();
-        });
-        $dayMinusDeviation = $tasks->sum(function ($task) {
-            return $task->getDayMinusDeviation();
-        });
+        // 取交集，得到合法的 users
+        return array_intersect($accounts, $users);
+    }
 
-        echo '<br />预计总工时<br />';
-        var_dump($estimateHours);
 
-        echo '<br />实际总工时<br />';
-        var_dump($consumedHours);
+    protected function getRows($users, $start, $end)
+    {
+        // 统计数据
+        $rows = array();
+        foreach ($users as $user) {
+            $bugs = $this->bugs->where('openedDate', '>=', $start)
+                ->where('openedDate', '<=', $end)
+                ->where(function ($query) use ($user) {
+                    $query->where('assignedTo', $user)
+                        ->orWhere('resolvedBy', $user);
+                })->groupBy('id')->get();
 
-        echo '<br />总工时正偏差<br />';
-        var_dump($hourPlusDeviation);
+            $tasks = $this->tasks->where('status', 'done')
+                ->where('finishedBy', $user)
+                ->where(function ($query) use ($start, $end) {
+                    $query->where(function ($q1) use ($start, $end) {
+                        $q1->where('estStarted', '>=', $start)->where('estStarted', '<=', $end);
+                    })->orWhere(function ($q2) use ($start, $end) {
+                        $q2->where('realStarted', '>=', $start)->where('realStarted', '<=', $end);
+                    });
+                })->get();
 
-        echo '<br />总工时负偏差<br />';
-        var_dump($hourMinusDeviation);
 
-        echo '<br />总工期正偏差<br />';
-        var_dump($dayPlusDeviation);
+            $row = array(
+                'estimate_sum' => $tasks->sum('estimate'),
+                'consumed_sum' => $tasks->sum('consumed'),
+                'hour_plus_deviation' => abs($tasks->sum(function ($task) {
+                    return $task->getHourPlusDeviation();
+                })),
+                'hour_minus_deviation' => abs($tasks->sum(function ($task) {
+                    return $task->getHourMinusDeviation();
+                })),
+                'day_plus_deviation' => abs($tasks->sum(function ($task) {
+                    return $task->getDayPlusDeviation();
+                })),
+                'day_minus_deviation' => abs($tasks->sum(function ($task) {
+                    return $task->getDayMinusDeviation();
+                })),
+                'assigned' => $bugs->where('assignedTo', $user)->count(),
+                'resolved' => $bugs->where('resolvedBy', $user)->count(),
+                'resolved_severity' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
+                    return in_array(data_get($bug, 'severity'), array(1, 2));
+                })->count(),
+                'resolved_activated' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
+                    return data_get($bug, 'activatedCount') > 0;
+                })->count(),
+            );
 
-        echo '<br />总工期负偏差<br />';
-        var_dump($dayMinusDeviation);
+            $rows[$user] = $row;
+        }
 
-        echo '<br />指派给我：<br>';
-        var_dump($bugs->where('assignedTo', 'dev1')->count());
-
-        echo '<br />由我解决：<br />';
-        var_dump($bugs->where('resolvedBy', 'dev1')->count());
-
-        echo '<br />由我解决的 1级和 2级：<br />';
-        var_dump($bugs->where('resolvedBy', 'dev1')->filter(function ($item) {
-            return in_array(data_get($item, 'severity'), array(1, 2));
-        })->count());
-
-        echo '<br />重复激活并且解决的 bug 数：<br />';
-        var_dump($bugs->where('resolvedBy', 'dev1')->filter(function ($item) {
-            return data_get($item, 'activatedCount') > 0;
-        })->count());
-
-        dd(\DB::getQueryLog());
-
-        // bug 按照创建时间
-        // task 按照预计开始时间、实际开始时间中小的那个
+        return $rows;
     }
 
 
