@@ -50,12 +50,41 @@ class TaskController extends Controller
             $query = $query->where('finishedBy', $finishedBy);
         }
         if ($start) {
+            $query = $query->where(function ($q) use ($start) {
+                $q->where('estStarted', '>=', $start)
+                    ->orWhere('realStarted', '>=', $start);
+            });
         }
         if ($end) {
+            $query = $query->where(function ($q) use ($end) {
+                $q->where('estStarted', '<=', $end)
+                    ->orWhere('realStarted', '<=', $end);
+            });
         }
 
+        $tasks = $query->get();
+
+        // 总的统计数据
+        $total = array(
+            'estimate_sum' => $tasks->sum('estimate'),
+            'consumed_sum' => $tasks->sum('consumed'),
+            'hour_plus_deviation' => abs($tasks->sum(function ($task) {
+                return $task->getHourPlusDeviation();
+            })),
+            'hour_minus_deviation' => abs($tasks->sum(function ($task) {
+                return $task->getHourMinusDeviation();
+            })),
+            'day_plus_deviation' => abs($tasks->sum(function ($task) {
+                return $task->getDayPlusDeviation();
+            })),
+            'day_minus_deviation' => abs($tasks->sum(function ($task) {
+                return $task->getDayMinusDeviation();
+            }))
+        );
+
         return view('deviations2', array(
-            'tasks' => $query->get(),
+            'tasks' => $tasks,
+            'total' => $total,
         ));
     }
 

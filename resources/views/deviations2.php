@@ -52,8 +52,8 @@
                 <td><?= $task->consumed; ?></td>
                 <td><?= abs($task->getHourPlusDeviation()); ?></td>
                 <td><?= abs($task->getHourMinusDeviation()); ?></td>
-                <td><?= $task->deadline->toDateString(); ?></td>
-                <td><?= $task->finishedDate->toDateString(); ?></td>
+                <td><?= $task->estStarted; ?></td>
+                <td><?= $task->realStarted; ?></td>
                 <td><?= $task->deadline->toDateString(); ?></td>
                 <td><?= $task->finishedDate->toDateString(); ?></td>
                 <td><?= abs($task->getDayPlusDeviation()); ?></td>
@@ -61,6 +61,21 @@
             </tr>
         <?php endforeach; ?>
         </tbody>
+        <tfoot>
+        <tr>
+            <td><strong>总计：</strong></td>
+            <td><strong><?= $total['estimate_sum']; ?></strong></td>
+            <td><strong><?= $total['consumed_sum']; ?></strong></td>
+            <td><strong><?= $total['hour_plus_deviation']; ?></strong></td>
+            <td><strong><?= $total['hour_minus_deviation']; ?></strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong><?= $total['day_plus_deviation']; ?></strong></td>
+            <td><strong><?= $total['day_minus_deviation']; ?></strong></td>
+        </tr>
+        </tfoot>
     </table>
 </div>
 <script type="text/javascript" src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
