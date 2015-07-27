@@ -33,3 +33,9 @@ $app->get(ROUTE_BASE . '/bug/search', array(
     'as' => 'bug_search',
     'uses' => 'App\Http\Controllers\BugController@search',
 ));
+
+// 任务偏差详情页面
+$app->get(ROUTE_BASE . '/task/deviations', array(
+    'as' => 'task_deviations',
+    'uses' => 'App\Http\Controllers\TaskController@deviations',
+));

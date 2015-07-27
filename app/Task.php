@@ -11,6 +11,22 @@ class Task extends Model
 
     public $timestamps = false;
 
+    public static $status = array(
+        'wait',
+        'doing',
+        'done',
+        'cancel',
+        'closed',
+    );
+
+    public static $friendlyStatus = array(
+        '' => '',
+        'wait' => '未开始',
+        'doing' => '进行中',
+        'done' => '已完成',
+        'cancel' => '已取消',
+        'closed' => '已关闭',
+    );
 
     public function user()
     {

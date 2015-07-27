@@ -34,7 +34,16 @@
         <tbody>
         <?php foreach ($rows as $user => $row): ?>
             <tr>
-                <td><?= $user; ?></td>
+                <td>
+                    <a href="<?= url('/task/deviations?' . http_build_query(array(
+                            'status' => 'done',
+                            'finishedBy' => $user,
+                            'start' => $start,
+                            'end' => $end,
+                        ))); ?>">
+                        <strong><?= $user; ?></strong>
+                    </a>
+                </td>
                 <td><?= $row['estimate_sum']; ?></td>
                 <td><?= $row['consumed_sum']; ?></td>
                 <td><?= abs($row['hour_plus_deviation']); ?></td>
