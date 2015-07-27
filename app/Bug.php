@@ -31,6 +31,20 @@ class Bug extends Model
         'tostory' => '转为需求',
     );
 
+    /**
+     * 在统计中被认为是生效的 bug 解决方式（已解决、无法重现、延期处理）
+     *
+     * @var array
+     */
+    public static $efficientResolution = array('fixed', 'notrepro', 'postponed');
+
+    /**
+     * 在统计中被认为是严重 bug 的级别
+     *
+     * @var array
+     */
+    public static $efficientSeverity = array('1', '2');
+
     public function total($projectId, $date = null)
     {
         if (is_null($date)) {

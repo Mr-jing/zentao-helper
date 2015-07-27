@@ -17,16 +17,20 @@ class BugController extends Controller
         $openedDateStart = \Request::input('openedDateStart', null);
         $openedDateEnd = \Request::input('openedDateEnd', null);
         $reactivated = \Request::input('reactivated', null);
+        $assignedTo = \Request::input('assignedTo', null);
         $resolvedBy = \Request::input('resolvedBy', null);
         $severity = \Request::input('severity', null);
+        $resolution = \Request::input('resolution', null);
 
         $validator = \Validator::make(
             array(
                 'openedDateStart' => $openedDateStart,
                 'openedDateEnd' => $openedDateEnd,
                 'reactivated' => $reactivated,
+                'assignedTo' => $assignedTo,
                 'resolvedBy' => $resolvedBy,
                 'severity' => $severity,
+                'resolution' => $resolution,
             ),
             array(
                 'openedDateStart' => 'date_format:Y-m-d',
@@ -43,10 +47,13 @@ class BugController extends Controller
         ) {
             return '起始时间必须小于截至时间';
         }
-
+//        dd(\Request::all());
 
         $query = $this->bugs;
 
+        if (is_string($assignedTo)) {
+            $query = $query->where('assignedTo', $assignedTo);
+        }
         if (is_string($resolvedBy)) {
             $query = $query->where('resolvedBy', $resolvedBy);
         }
@@ -56,6 +63,9 @@ class BugController extends Controller
         if ($severity) {
             $query = $query->whereIn('severity', explode('|', $severity));
         }
+        if ($resolution) {
+            $query = $query->whereIn('resolution', explode('|', $resolution));
+        }
         if ($openedDateStart) {
             $query = $query->where('openedDate', '>=', $openedDateStart);
         }
@@ -63,16 +73,9 @@ class BugController extends Controller
             $query = $query->where('openedDate', '<=', $openedDateEnd);
         }
 
-
-        echo '<pre>';
-        var_dump($openedDateStart);
-        var_dump($openedDateEnd);
-        var_dump($reactivated);
-        var_dump($resolvedBy);
-        var_dump($severity);
-
-        var_dump(count($query->get()));
-        dd(\DB::getQueryLog());
+        return view('bug', array(
+            'bugs' => $query->get(),
+        ));
     }
 
 }

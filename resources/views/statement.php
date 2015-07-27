@@ -41,10 +41,70 @@
                 <td><?= abs($row['hour_minus_deviation']); ?></td>
                 <td><?= abs($row['day_plus_deviation']); ?></td>
                 <td><?= abs($row['day_minus_deviation']); ?></td>
-                <td><?= $row['assigned']; ?></td>
-                <td><?= $row['resolved']; ?></td>
-                <td><?= $row['resolved_severity']; ?></td>
-                <td><?= $row['resolved_activated']; ?></td>
+                <td>
+                    <a href="<?= url('/bug/search?' . http_build_query(array(
+                            'assignedTo' => $user,
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                        ))); ?>">
+                        <strong><?= $row['assigned']; ?></strong>
+                    </a>
+                </td>
+                <td>
+                    <a href="<?= url('/bug/search?' . http_build_query(array(
+                            'resolvedBy' => $user,
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                        ))); ?>">
+                        <strong><?= $row['resolved']; ?></strong>
+                    </a>
+                    (<a href="<?= url('/bug/search?' . http_build_query(array(
+                            'resolvedBy' => $user,
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                            'resolution' => implode('|', \App\Bug::$efficientResolution),
+                        ))); ?>">
+                        <strong><?= $row['efficient_resolved']; ?></strong>
+                    </a>)
+                </td>
+                <td>
+                    <a href="<?= url('/bug/search?' . http_build_query(array(
+                            'resolvedBy' => $user,
+                            'severity' => implode('|', \App\Bug::$efficientSeverity),
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                        ))); ?>">
+                        <strong><?= $row['resolved_severity']; ?></strong>
+                    </a>
+                    (<a href="<?= url('/bug/search?' . http_build_query(array(
+                            'resolvedBy' => $user,
+                            'severity' => implode('|', \App\Bug::$efficientSeverity),
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                            'resolution' => implode('|', \App\Bug::$efficientResolution),
+                        ))); ?>">
+                        <strong><?= $row['efficient_resolved_severity']; ?></strong>
+                    </a>)
+                </td>
+                <td>
+                    <a href="<?= url('/bug/search?' . http_build_query(array(
+                            'resolvedBy' => $user,
+                            'reactivated' => 1,
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                        ))); ?>">
+                        <strong><?= $row['resolved_activated']; ?></strong>
+                    </a>
+                    (<a href="<?= url('/bug/search?' . http_build_query(array(
+                            'resolvedBy' => $user,
+                            'reactivated' => 1,
+                            'openedDateStart' => $start,
+                            'openedDateEnd' => $end,
+                            'resolution' => implode('|', \App\Bug::$efficientResolution),
+                        ))); ?>">
+                        <strong><?= $row['efficient_resolved_activated']; ?></strong>
+                    </a>)
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>

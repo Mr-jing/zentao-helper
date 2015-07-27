@@ -154,11 +154,22 @@ class PageController extends Controller
                 })),
                 'assigned' => $bugs->where('assignedTo', $user)->count(),
                 'resolved' => $bugs->where('resolvedBy', $user)->count(),
+                'efficient_resolved' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
+                    return in_array(data_get($bug, 'resolution'), Bug::$efficientResolution);
+                })->count(),
                 'resolved_severity' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
-                    return in_array(data_get($bug, 'severity'), array(1, 2));
+                    return in_array(data_get($bug, 'severity'), Bug::$efficientSeverity);
+                })->count(),
+                'efficient_resolved_severity' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
+                    return in_array(data_get($bug, 'severity'), Bug::$efficientSeverity) &&
+                    in_array(data_get($bug, 'resolution'), Bug::$efficientResolution);
                 })->count(),
                 'resolved_activated' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
                     return data_get($bug, 'activatedCount') > 0;
+                })->count(),
+                'efficient_resolved_activated' => $bugs->where('resolvedBy', $user)->filter(function ($bug) {
+                    return data_get($bug, 'activatedCount') > 0 &&
+                    in_array(data_get($bug, 'resolution'), Bug::$efficientResolution);
                 })->count(),
             );
 
