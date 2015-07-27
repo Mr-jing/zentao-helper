@@ -15,6 +15,26 @@
 
 <div>
     <h1 class="text-center"> <?= $start; ?> 至 <?= $end; ?> 统计结果</h1>
+
+    <div style="width: 500px; margin: 30px auto">
+        <form method="GET" action="<?= url('/statement'); ?>">
+            <div class="form-group">
+                <label for="users">账号：</label>
+                <textarea id="users" name="users" class="form-control" rows="5"
+                          required><?= implode('|', $users); ?></textarea>
+            </div>
+            <div class="form-group">
+                <label for="start">起始时间：</label>
+                <input type="text" id="start" name="start" class="form-control" required value="<?= $start; ?>">
+            </div>
+            <div class="form-group">
+                <label for="end">截止时间：</label>
+                <input type="text" id="end" name="end" class="form-control" required value="<?= $end; ?>">
+            </div>
+            <button class="btn btn-lg btn-success btn-block" type="submit">查询</button>
+        </form>
+    </div>
+
     <table class="table table-hover">
         <thead>
         <tr>

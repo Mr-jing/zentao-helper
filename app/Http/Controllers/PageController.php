@@ -92,6 +92,7 @@ class PageController extends Controller
         $users = $this->getUsers($users);
 
         return view('statement', array(
+            'users' => $users,
             'start' => $start,
             'end' => $end,
             'rows' => $this->getRows($users, $start, $end),
@@ -116,6 +117,19 @@ class PageController extends Controller
 
     protected function getRows($users, $start, $end)
     {
+//        $bugs = $this->bugs->where('openedDate', '>=', $start)
+//            ->where('openedDate', '<=', $end)
+//            ->get();
+
+//        $bugs = $this->bugs->where('openedDate', '>=', $start)
+//            ->where('openedDate', '<=', $end)
+//            ->where(function ($query) use ($users) {
+//                $query->whereIn('assignedTo', $users)
+//                    ->orWhereIn('resolvedBy', $users);
+//            })
+//            ->groupBy('id')
+//            ->get();
+
         // 统计数据
         $rows = array();
         foreach ($users as $user) {
@@ -125,6 +139,7 @@ class PageController extends Controller
                     $query->where('assignedTo', $user)
                         ->orWhere('resolvedBy', $user);
                 })->groupBy('id')->get();
+
 
             $tasks = $this->tasks->where('status', 'done')
                 ->where('finishedBy', $user)
